@@ -1,20 +1,18 @@
-const Player = (name, position = undefined, mark) => {
-  return {
-    name,
-    position,
-    mark,
-  };
-};
-
-let Player1;
-let Player2;
+/* eslint-disable no-await-in-loop */
+/* eslint-disable no-plusplus */
+/* eslint-disable default-param-last */
+const Player = (name, position = undefined, mark) => ({
+  name,
+  position,
+  mark,
+});
 
 const gameBoard = (() => {
   // Module used to create the gameboard.
   const board = ["", "", "", "", "", "", "", "", ""];
 
   const clearBoard = () => {
-    for (let i = 0; i < board.length; i++) {
+    for (let i = 0; i < 9; i++) {
       board[i] = "";
     }
   };
@@ -87,7 +85,7 @@ function gameController(Player1Name, Player2Name) {
       // In case a position is empty, the function adds a Mark to the position.
       newGame.addMark(position, player.mark);
       display.markStyle();
-    } else if (array[position] !== "") {
+    } else {
       // If the position is taken, another position is requested and the code execution stops until a valid position is entered.
       console.log(array[position]);
       let newPosition = position;
@@ -103,33 +101,39 @@ function gameController(Player1Name, Player2Name) {
   }
 
   async function playRound() {
-    // Function used to play a round of the game. Async is used because we will need to wait for the players to click.
+    // Function used to play a round of the game. Async is used because we need to wait for the players to click.
+    let i = 0;
+    let turn = 1;
+    let position = "";
     while (i < 9) {
-      position = await display.getPosition();
-      await checkPosition(position, newGame.getBoard(), Player1);
-      if (checkWinner(newGame.getBoard(), winningCombinations)) {
-        display.showPopup(i, Player1);
-        newGame.clearBoard();
-        position = null;
-        return;
+      if (turn === 1) {
+        display.updateText(1);
+        position = await display.getPosition();
+        await checkPosition(position, newGame.getBoard(), Player1);
+        if (checkWinner(newGame.getBoard(), winningCombinations)) {
+          display.showPopup(i, Player1);
+          newGame.clearBoard();
+          return;
+        }
+        i++;
+        turn = 2;
+      } else {
+        display.updateText(2);
+        position = await display.getPosition();
+        checkPosition(position, newGame.getBoard(), Player2);
+        if (checkWinner(newGame.getBoard(), winningCombinations)) {
+          display.showPopup(i, Player2);
+          newGame.clearBoard();
+          return;
+        }
+        i++;
+        turn = 1;
       }
-      i++;
       if (i === 9) {
         display.showPopup(i);
-        position = null;
         return;
       }
-      position = await display.getPosition();
-      await checkPosition(position, newGame.getBoard(), Player2);
-      if (checkWinner(newGame.getBoard(), winningCombinations)) {
-        display.showPopup(i, Player2);
-        newGame.clearBoard();
-        position = null;
-        return;
-      }
-      i++;
     }
-    return;
   }
 
   return { playRound };
@@ -140,17 +144,28 @@ function gameController(Player1Name, Player2Name) {
 const displayController = (() => {
   const gameBoardDiv = document.getElementById("gameboard");
 
-  function drawBoard(gameBoard) {
+  function drawBoard(gameboard) {
     // Function used to draw the initial empty gameBoard;
-    gameBoard.getBoard().forEach((element) => {
+    gameboard.getBoard().forEach((element, index) => {
       const squareDiv = document.createElement("div");
       squareDiv.className = "square";
       squareDiv.innerText = element;
+      squareDiv.setAttribute("data-index", index);
       gameBoardDiv.appendChild(squareDiv);
     });
   }
 
   drawBoard(gameBoard);
+
+  function updateText(turn) {
+    //Function used to update the Text's information.
+    const text = document.getElementById("turn-text");
+    if (turn === 1) {
+      text.innerText = "It's X's turn.";
+    } else {
+      text.innerText = "It's O's turn.";
+    }
+  }
 
   function squareClick() {
     // Promise function used to return the index of the square clicked by the player.
@@ -183,15 +198,18 @@ const displayController = (() => {
 
   function startNewGame() {
     // Function used to start a new game
-    Player1 = prompt(`Write the name of the Player 1: `);
-    Player2 = prompt(`Write the name of the Player 2: `);
-    gameBoard.clearBoard();
-    const game = gameController(Player1, Player2);
+    const game = gameController("X", "O");
     game.playRound();
   }
 
   const newGameButton = document.getElementById("new-game");
-  newGameButton.addEventListener("click", startNewGame);
+  newGameButton.addEventListener("click", () => {
+    newGameButton.style.display = "none";
+    startNewGame();
+  });
+
+  const restartGameButton = document.querySelector(".restart-game");
+  restartGameButton.addEventListener("click", startNewGame);
 
   function markStyle() {
     // Function used to add custom classnames to the marks added by the user.
@@ -206,28 +224,20 @@ const displayController = (() => {
     });
   }
 
-  function closePopup() {
-    // Function used to close the after-game popup.
-    const popupDivSelector = document.querySelector(".final-popup");
-    const closeButtonSelector = document.querySelector(".close-game");
-    closeButtonSelector.addEventListener("click", () => {
-      popupDivSelector.style.display = "none";
-    });
-  }
-
   function showPopup(i, Player = undefined) {
     // Function used to show a Popup afther the games finishes
+    const popupBackgroundSelector = document.querySelector(".popup-background");
+    popupBackgroundSelector.style.display = "block";
     const popupDivSelector = document.querySelector(".final-popup");
     popupDivSelector.style.display = "flex";
     const popupTextSelector = document.querySelector(".popup-text");
     const restartButtonSelector = document.querySelector(".restart-game");
     restartButtonSelector.addEventListener("click", () => {
       popupDivSelector.style.display = "none";
-      const game = gameController(Player1, Player2);
-      game.playRound();
+      popupBackgroundSelector.style.display = "none";
     });
     if (i === 9) {
-      popupTextSelector.innerText = "Nobody wins! It's a Draw!"; // Text displaying the game is even.
+      popupTextSelector.innerText = "Nobody wins!"; // Text displaying the game is even.
       closePopup();
       return;
     }
@@ -235,5 +245,26 @@ const displayController = (() => {
     closePopup();
   }
 
-  return { drawBoard, updateBoard, getPosition, markStyle, showPopup };
+  function closePopup() {
+    // Function used to close the after-game popup.
+    const popupDivSelector = document.querySelector(".final-popup");
+    const closeButtonSelector = document.querySelector(".close-game");
+    const text = document.getElementById("turn-text");
+    const popupBackgroundSelector = document.querySelector(".popup-background");
+    closeButtonSelector.addEventListener("click", () => {
+      popupBackgroundSelector.style.display = "none";
+      popupDivSelector.style.display = "none";
+      newGameButton.style.display = "block";
+      text.innerText = "Click 'New Game' to Play Again";
+    });
+  }
+
+  return {
+    drawBoard,
+    updateBoard,
+    getPosition,
+    markStyle,
+    showPopup,
+    updateText,
+  };
 })();

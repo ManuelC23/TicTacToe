@@ -3,9 +3,13 @@
   src: url("./fonts/Rancho-Regular.ttf");
 }
 
+html,
 body {
-  background-color: rgb(129, 129, 129);
+  background-color: rgb(255, 255, 255);
   margin: 0px;
+  height: 100%;
+  padding: 0;
+  overflow-y: hidden;
 }
 
 h1 {
@@ -13,13 +17,20 @@ h1 {
   font-family: Rancho, sans-serif;
   font-size: max(7vw, 7vh);
   margin: 0px;
-  background-color: rgb(159, 215, 255);
+  background-color: rgb(255, 255, 255);
 }
 
 .main-container {
   display: flex;
-  justify-content: center;
+  flex-direction: column;
+  align-items: center;
   margin: 20px;
+  height: 100%;
+}
+
+.main-container #turn-text {
+  font-family: Rancho, sans-serif;
+  font-size: max(3vw, 3vh);
 }
 
 #gameboard {
@@ -29,14 +40,58 @@ h1 {
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
   gap: 2%;
+  background-color: #cfcfcf;
+  border-radius: 30px;
+}
+
+#new-game {
+  margin: 20px;
+  font-family: Rancho, sans-serif;
+  font-size: max(3vw, 3vh);
+  color: white;
+  padding: 0px 30px;
+  background-color: #0084ff;
+  border: none;
+  border-radius: 20px;
+}
+
+#new-game:hover {
+  margin: 20px;
+  font-family: Rancho, sans-serif;
+  font-size: max(3vw, 3vh);
+  color: white;
+  padding: 0px 30px;
+  background-color: #2193fd;
+  border: none;
+  border-radius: 20px;
 }
 
 .square {
   width: 100%;
-  background-color: aliceblue;
+  background-color: rgb(250, 250, 250);
   display: flex;
   align-items: center;
   justify-content: center;
+}
+
+.square:hover {
+  background-color: azure;
+}
+
+[data-index="0"] {
+  border-radius: 20px 0px 0px 0px;
+}
+
+[data-index="2"] {
+  border-radius: 0px 20px 0px 0px;
+}
+
+[data-index="6"] {
+  border-radius: 0px 0px 0px 20px;
+}
+
+[data-index="8"] {
+  border-radius: 0px 0px 20px 0px;
 }
 
 .square.X {
@@ -51,21 +106,31 @@ h1 {
   color: blue;
 }
 
+.popup-background {
+  display: none;
+  top: 0;
+  left: 0;
+  position: fixed;
+  height: 100%;
+  width: 100%;
+  background-color: rgba(255, 255, 255, 0.8);
+}
+
 .final-popup {
   display: none;
   flex-direction: column;
   align-items: center;
   justify-content: center;
   border-radius: 25px;
-  background-color: rgb(236, 236, 236);
+  background-color: rgba(250, 250, 250, 0.95);
   position: fixed;
   padding: 30px;
-  top: 15%;
+  top: 20%;
   left: 50%;
   transform: translateX(-50%);
   margin: auto;
-  width: 30vw;
-  height: 30vh;
+  width: 25vw;
+  height: 25vh;
 }
 
 .final-popup .popup-text {
