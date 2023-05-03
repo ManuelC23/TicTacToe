@@ -96,8 +96,9 @@ function gameController(Player1Name, Player2Name) {
     // Function used to play a round of the game. Async is used because we will need to wait for the players to click.
     let position;
     while (i < 9) {
-      position = await display.getPosition(); //
+      position = await display.getPosition();
       await checkPosition(position, newGame.getBoard(), Player1);
+      display.markStyle();
       if (checkWinner(newGame.getBoard(), winningCombinations)) {
         console.log(`${Player1.name} won the game`);
         newGame.clearBoard();
@@ -110,6 +111,7 @@ function gameController(Player1Name, Player2Name) {
       }
       position = await display.getPosition();
       await checkPosition(position, newGame.getBoard(), Player2);
+      display.markStyle();
       if (checkWinner(newGame.getBoard(), winningCombinations)) {
         console.log(`${Player2.name} won the game`);
         newGame.clearBoard();
@@ -125,6 +127,8 @@ function gameController(Player1Name, Player2Name) {
 
 const displayController = (() => {
   const gameBoardDiv = document.getElementById("gameboard");
+  let Player1;
+  let Player2;
 
   function drawBoard(gameBoard) {
     // Function used to draw the initial empty gameBoard;
@@ -168,14 +172,28 @@ const displayController = (() => {
   }
 
   function startNewGame() {
+    // Function used to start a new game
     gameBoard.clearBoard();
-    let Player1 = prompt(`Write the name of the Player 1: `);
-    let Player2 = prompt(`Write the name of the Player 2: `);
+    Player1 = prompt(`Write the name of the Player 1: `);
+    Player2 = prompt(`Write the name of the Player 2: `);
     gameController(Player1, Player2);
   }
 
   const newGameButton = document.getElementById("new-game");
   newGameButton.addEventListener("click", startNewGame);
 
-  return { drawBoard, updateBoard, getPosition };
+  function markStyle() {
+    // Function used to add custom classnames to the marks added by the user.
+    const squares = document.querySelectorAll(".square");
+    squares.forEach((square) => {
+      if (square.innerText === "X") {
+        square.className = "square X";
+      }
+      if (square.innerText === "O") {
+        square.className = "square O";
+      }
+    });
+  }
+
+  return { drawBoard, updateBoard, getPosition, markStyle };
 })();

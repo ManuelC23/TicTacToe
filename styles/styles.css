@@ -1,21 +1,31 @@
+@font-face {
+  font-family: "Rancho";
+  src: url("./fonts/Rancho-Regular.ttf");
+}
+
 body {
-  background-color: cadetblue;
+  background-color: rgb(129, 129, 129);
   margin: 0px;
 }
 
 h1 {
   text-align: center;
+  font-family: Rancho, sans-serif;
+  font-size: max(7vw, 7vh);
+  margin: 0px;
+  background-color: rgb(159, 215, 255);
 }
 
 .main-container {
   display: flex;
   justify-content: center;
+  margin: 20px;
 }
 
 #gameboard {
   display: grid;
-  width: 30vw;
-  height: 30vw;
+  width: max(25vh, 30vw);
+  height: max(25vh, 30vw);
   grid-template-columns: 1fr 1fr 1fr;
   grid-template-rows: 1fr 1fr 1fr;
   gap: 2%;
@@ -24,4 +34,19 @@ h1 {
 .square {
   width: 100%;
   background-color: aliceblue;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.square.X {
+  font-family: "Rancho", sans-serif;
+  font-size: max(7vh, 7vw);
+  color: red;
+}
+
+.square.O {
+  font-family: "Rancho", sans-serif;
+  font-size: max(7vh, 7vw);
+  color: blue;
 }
