@@ -28,7 +28,7 @@ h1 {
   height: 100%;
 }
 
-.main-container #turn-text {
+.main-container .turn-text {
   font-family: Rancho, sans-serif;
   font-size: max(3vw, 3vh);
 }

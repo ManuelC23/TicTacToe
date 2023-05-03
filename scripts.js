@@ -159,7 +159,7 @@ const displayController = (() => {
 
   function updateText(turn) {
     //Function used to update the Text's information.
-    const text = document.getElementById("turn-text");
+    const text = document.querySelector(".turn-text");
     if (turn === 1) {
       text.innerText = "It's X's turn.";
     } else {
@@ -198,6 +198,7 @@ const displayController = (() => {
 
   function startNewGame() {
     // Function used to start a new game
+    removeStyle();
     const game = gameController("X", "O");
     game.playRound();
   }
@@ -211,15 +212,22 @@ const displayController = (() => {
   const restartGameButton = document.querySelector(".restart-game");
   restartGameButton.addEventListener("click", startNewGame);
 
+  function removeStyle() {
+    const squares = document.querySelectorAll(".square");
+    squares.forEach((square) => {
+      square.className = "square";
+    });
+  }
+
   function markStyle() {
     // Function used to add custom classnames to the marks added by the user.
     const squares = document.querySelectorAll(".square");
     squares.forEach((square) => {
       if (square.innerText === "X") {
-        square.className = "square X";
+        square.className = "square X animate__animated animate__bounceIn";
       }
       if (square.innerText === "O") {
-        square.className = "square O";
+        square.className = "square O animate__animated animate__bounceIn";
       }
     });
   }
@@ -249,7 +257,7 @@ const displayController = (() => {
     // Function used to close the after-game popup.
     const popupDivSelector = document.querySelector(".final-popup");
     const closeButtonSelector = document.querySelector(".close-game");
-    const text = document.getElementById("turn-text");
+    const text = document.querySelector(".turn-text");
     const popupBackgroundSelector = document.querySelector(".popup-background");
     closeButtonSelector.addEventListener("click", () => {
       popupBackgroundSelector.style.display = "none";
