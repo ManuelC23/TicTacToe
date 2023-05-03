@@ -102,16 +102,15 @@ function gameController(Player1Name, Player2Name) {
     }
   }
 
-  function playRound() {
+  async function playRound() {
     // Function used to play a round of the game. Async is used because we will need to wait for the players to click.
     while (i < 9) {
-      let position = parseInt(prompt("Escribe el numero: "));
-      checkPosition(position, newGame.getBoard(), Player1);
+      position = await display.getPosition();
+      await checkPosition(position, newGame.getBoard(), Player1);
       if (checkWinner(newGame.getBoard(), winningCombinations)) {
         display.showPopup(i, Player1);
         newGame.clearBoard();
         position = null;
-        i = 9;
         return;
       }
       i++;
@@ -120,13 +119,12 @@ function gameController(Player1Name, Player2Name) {
         position = null;
         return;
       }
-      position = parseInt(prompt("Escribe el numero: "));
-      checkPosition(position, newGame.getBoard(), Player2);
+      position = await display.getPosition();
+      await checkPosition(position, newGame.getBoard(), Player2);
       if (checkWinner(newGame.getBoard(), winningCombinations)) {
         display.showPopup(i, Player2);
         newGame.clearBoard();
         position = null;
-        i = 9;
         return;
       }
       i++;
