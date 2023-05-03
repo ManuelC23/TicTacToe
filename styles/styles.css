@@ -50,3 +50,41 @@ h1 {
   font-size: max(7vh, 7vw);
   color: blue;
 }
+
+.final-popup {
+  display: none;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  border-radius: 25px;
+  background-color: rgb(236, 236, 236);
+  position: fixed;
+  padding: 30px;
+  top: 15%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin: auto;
+  width: 30vw;
+  height: 30vh;
+}
+
+.final-popup .popup-text {
+  font-family: Rancho, sans-serif;
+  font-size: max(6vh, 5vw);
+}
+
+.final-popup .popup-buttons {
+  display: flex;
+  justify-content: space-around;
+  width: 100%;
+  margin-top: 20px;
+}
+
+.final-popup .popup-buttons img {
+  width: 80px;
+  height: auto;
+}
+
+.final-popup .popup-buttons img:hover {
+  transform: scale(1.2);
+}

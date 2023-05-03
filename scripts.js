@@ -6,6 +6,9 @@ const Player = (name, position = undefined, mark) => {
   };
 };
 
+let Player1;
+let Player2;
+
 const gameBoard = (() => {
   // Module used to create the gameboard.
   const board = ["", "", "", "", "", "", "", "", ""];
@@ -26,17 +29,19 @@ const gameBoard = (() => {
 
   const addMark = (position, mark) => {
     board[position] = mark;
-    printBoard();
     displayController.updateBoard(gameBoard.getBoard());
   };
 
   return { clearBoard, printBoard, addMark, getBoard };
 })();
 
+////////////////////////////////////////////////////////////////////////////////////////////
+
 function gameController(Player1Name, Player2Name) {
   const newGame = gameBoard;
   const display = displayController;
   newGame.clearBoard();
+  display.updateBoard(newGame.getBoard());
 
   const Player1 = Player(Player1Name, undefined, "X");
   const Player2 = Player(Player2Name, undefined, "O");
@@ -81,54 +86,61 @@ function gameController(Player1Name, Player2Name) {
     if (array[position] === "") {
       // In case a position is empty, the function adds a Mark to the position.
       newGame.addMark(position, player.mark);
-    } else {
+      display.markStyle();
+    } else if (array[position] !== "") {
       // If the position is taken, another position is requested and the code execution stops until a valid position is entered.
+      console.log(array[position]);
       let newPosition = position;
       while (array[newPosition] !== "") {
         console.log(array[newPosition] !== "");
+        console.log(array);
         newPosition = await display.getPosition();
       }
       newGame.addMark(newPosition, player.mark);
+      display.markStyle();
+      return;
     }
   }
 
-  async function playRound() {
+  function playRound() {
     // Function used to play a round of the game. Async is used because we will need to wait for the players to click.
-    let position;
     while (i < 9) {
-      position = await display.getPosition();
-      await checkPosition(position, newGame.getBoard(), Player1);
-      display.markStyle();
+      let position = parseInt(prompt("Escribe el numero: "));
+      checkPosition(position, newGame.getBoard(), Player1);
       if (checkWinner(newGame.getBoard(), winningCombinations)) {
-        console.log(`${Player1.name} won the game`);
+        display.showPopup(i, Player1);
         newGame.clearBoard();
-        break;
+        position = null;
+        i = 9;
+        return;
       }
       i++;
       if (i === 9) {
-        console.log("Draw!");
-        break;
+        display.showPopup(i);
+        position = null;
+        return;
       }
-      position = await display.getPosition();
-      await checkPosition(position, newGame.getBoard(), Player2);
-      display.markStyle();
+      position = parseInt(prompt("Escribe el numero: "));
+      checkPosition(position, newGame.getBoard(), Player2);
       if (checkWinner(newGame.getBoard(), winningCombinations)) {
-        console.log(`${Player2.name} won the game`);
+        display.showPopup(i, Player2);
         newGame.clearBoard();
-        break;
+        position = null;
+        i = 9;
+        return;
       }
       i++;
     }
+    return;
   }
 
-  playRound();
-  display.updateBoard(newGame.getBoard());
+  return { playRound };
 }
+
+/////////////////////////////////////////////////////////////////////////////////////////
 
 const displayController = (() => {
   const gameBoardDiv = document.getElementById("gameboard");
-  let Player1;
-  let Player2;
 
   function drawBoard(gameBoard) {
     // Function used to draw the initial empty gameBoard;
@@ -145,7 +157,7 @@ const displayController = (() => {
   function squareClick() {
     // Promise function used to return the index of the square clicked by the player.
     const squares = document.querySelectorAll(".square");
-    return new Promise((resolve, reject) => {
+    return new Promise((resolve) => {
       squares.forEach((square, index) => {
         square.addEventListener("click", () => {
           position = index;
@@ -173,10 +185,11 @@ const displayController = (() => {
 
   function startNewGame() {
     // Function used to start a new game
-    gameBoard.clearBoard();
     Player1 = prompt(`Write the name of the Player 1: `);
     Player2 = prompt(`Write the name of the Player 2: `);
-    gameController(Player1, Player2);
+    gameBoard.clearBoard();
+    const game = gameController(Player1, Player2);
+    game.playRound();
   }
 
   const newGameButton = document.getElementById("new-game");
@@ -195,5 +208,34 @@ const displayController = (() => {
     });
   }
 
-  return { drawBoard, updateBoard, getPosition, markStyle };
+  function closePopup() {
+    // Function used to close the after-game popup.
+    const popupDivSelector = document.querySelector(".final-popup");
+    const closeButtonSelector = document.querySelector(".close-game");
+    closeButtonSelector.addEventListener("click", () => {
+      popupDivSelector.style.display = "none";
+    });
+  }
+
+  function showPopup(i, Player = undefined) {
+    // Function used to show a Popup afther the games finishes
+    const popupDivSelector = document.querySelector(".final-popup");
+    popupDivSelector.style.display = "flex";
+    const popupTextSelector = document.querySelector(".popup-text");
+    const restartButtonSelector = document.querySelector(".restart-game");
+    restartButtonSelector.addEventListener("click", () => {
+      popupDivSelector.style.display = "none";
+      const game = gameController(Player1, Player2);
+      game.playRound();
+    });
+    if (i === 9) {
+      popupTextSelector.innerText = "Nobody wins! It's a Draw!"; // Text displaying the game is even.
+      closePopup();
+      return;
+    }
+    popupTextSelector.innerText = `${Player.name} wins!`; // Text displaying the game winner in case there's any.
+    closePopup();
+  }
+
+  return { drawBoard, updateBoard, getPosition, markStyle, showPopup };
 })();
